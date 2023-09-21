@@ -22,6 +22,10 @@ generic_sts_objective (at the end of load screen when starting new game)
 05_leave_coyote 1818178864
 */
 
+state ("Cyberpunk","2,0")
+{
+	string50 objective : 0x046B6A20, 0xB8, 0x120;
+}
 state("Cyberpunk2077","1.63")
 {
 	string50 objective : 0x04C913B0, 0xB8, 0x118, 0x0;
@@ -71,6 +75,7 @@ startup
   {
 	    vars.TimerStart = (EventHandler) ((s, e) => timer.IsGameTimePaused = true);
         timer.OnStart += vars.TimerStart;
+	  	refreshRate=30;
 		if (timer.CurrentTimingMethod == TimingMethod.RealTime)
 // Asks user to change to game time if LiveSplit is currently set to Real Time.
     {        
@@ -187,6 +192,13 @@ init
 	vars.LoadingPtr = scanner.Scan(new SigScanTarget(2, "89??????????C6????????????E8????????4584??4889") { 
 	OnFound = (process, scanners, addr) => addr + 0x4 + process.ReadValue<int>(addr)
 	});
+	if(version == "2.0")
+	{
+		vars.LoadingPtr = scanner.Scan(new SigScanTarget(2, "89??????????F0????????????????48FF??33??4889??????????E8????????4584") { 
+		OnFound = (process, scanners, addr) => addr + 0x4 + process.ReadValue<int>(addr)
+		});
+	}
+
 	
 	if (vars.LoadingPtr == IntPtr.Zero)
 	{
