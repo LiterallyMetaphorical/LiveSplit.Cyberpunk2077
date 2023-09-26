@@ -244,7 +244,6 @@ start
     return (current.objective == "generic_sts_objective" || current.objective == "talk_songbird" && current.objective != old.objective);
 }
 
-
 split
 {
 	return current.objective != old.objective && old.objective != null && settings[current.objective];
