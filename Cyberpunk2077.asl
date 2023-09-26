@@ -21,7 +21,14 @@ generic_sts_objective (at the end of load screen when starting new game)
 03_sit_down 1935618864
 05_leave_coyote 1818178864
 */
-
+state ("Cyberpunk2077","2,0")
+{
+	string50 objective : 0x046B6A20, 0xB8, 0x120;
+}
+state("Cyberpunk2077","1.63")
+{
+	string50 objective : 0x04C913B0, 0xB8, 0x118, 0x0;
+}
 state("Cyberpunk2077","1.61")
 {
 	byte loading : 0x3F1FBF0;
@@ -84,6 +91,7 @@ state("Cyberpunk2077", "1.04")
 {
 	byte loading : 0x3CBF140;
 }
+
 
 startup
   {
@@ -200,46 +208,46 @@ init
 {
 	version = modules.First().FileVersionInfo.ProductVersion;
 	vars.loading = false;
-//timer.IsGameTimePaused = false;
+	vars.LoadingPtr = IntPtr.Zero;
+	var module = modules.First();
+	var scanner = new SignatureScanner(game, module.BaseAddress, module.ModuleMemorySize);
+	if(version == "2.0")
+	{
+		vars.LoadingPtr = scanner.Scan(new SigScanTarget(2, "89??????????F0????????????????48FF??33??4889??????????E8????????4584") { 
+		OnFound = (process, scanners, addr) => addr + 0x4 + process.ReadValue<int>(addr)
+		});
+		if (vars.LoadingPtr == IntPtr.Zero)
+		{
+        	throw new Exception("Game engine not initialized - retrying");
+		}
+	}
+
+	
+
+	
+	vars.loadingWatcher = new MemoryWatcher<int>(vars.LoadingPtr);
 }
-
-
-start
-{
-//Start the timer when the first objective of the game is detected
-    return (current.objective == "generic_sts_objective" && current.objective != old.objective);
-}
-
 
 update
 {
+	vars.loadingWatcher.Update(game);
 	if (settings["quest_state"]) 
     {
       vars.SetTextComponent("Current Objective", (current.objective)); 
     }
+	
+}
 
-//Use cases for each version of the game listed in the State method
-		switch (version) 
-	{
-		case "1.04": case "1.06": case "1.1": case "1.11": case "1.12": case "1.2": case "1.21": case "1.23": case "1.31": case "1.52": case "1.61":
-			vars.loading = current.loading != 70;
-			break;
-		case "1.05":
-			vars.loading = current.loading != 109;
-			break;
-	}
-
-//for debugging purposes
- //   print(current.objective);
- //   print(old.objective);
-    print(current.loading.ToString());
+start
+{
+//Starts the timer when the first objective of either the Main Quest or Phantom Liberty is detected
+    return (current.objective == "generic_sts_objective" || current.objective == "talk_songbird" && current.objective != old.objective);
 }
 
 
 split
 {
 	return current.objective != old.objective && old.objective != null && settings[current.objective];
-    //return current.objective != old.objective && old.objective != "" && current.objective != "" && settings[current.objective]; RETIRED, doesn't work
 }
 	
 /*checks for the following
@@ -254,8 +262,11 @@ exit
 }
 
 isLoading
-{	
-	return vars.loading;
+{	if(version == "2.0")
+	{
+		return vars.loadingWatcher.Current == 10;
+	}
+	return current.loading != 70;
 }
 
 shutdown
