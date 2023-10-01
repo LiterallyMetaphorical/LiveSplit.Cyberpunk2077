@@ -23,7 +23,6 @@ generic_sts_objective (at the end of load screen when starting new game)
 */
 state ("Cyberpunk2077","2,0")
 {
-	byte loading : 0x3327518;
 	string50 objective : 0x046B6A20, 0xB8, 0x120;
 }
 state("Cyberpunk2077","1.63")
@@ -75,7 +74,7 @@ state("Cyberpunk2077","1.11")
 state("Cyberpunk2077", "1.1")
 {
 	byte loading : 0x3C80F00;
-    	string50 objective : 0x04320A50, 0x260, 0x28, 0x8, 0x38, 0xB8, 0x118, 0x0;
+    string50 objective : 0x04320A50, 0x260, 0x28, 0x8, 0x38, 0xB8, 0x118, 0x0;
 }
 
 state("Cyberpunk2077", "1.06")
@@ -96,47 +95,47 @@ state("Cyberpunk2077", "1.04")
 
 startup
   {
-    	vars.TimerStart = (EventHandler) ((s, e) => timer.IsGameTimePaused = true);
-	timer.OnStart += vars.TimerStart;
-	refreshRate=30;
-	if (timer.CurrentTimingMethod == TimingMethod.RealTime)
-	// Asks user to change to game time if LiveSplit is currently set to Real Time.
-    	{        
-	        var timingMessage = MessageBox.Show (
-	    		"This game uses Time without Loads (Game Time) as the main timing method.\n"+
-	            	"LiveSplit is currently set to show Real Time (RTA).\n"+
-	            	"Would you like to set the timing method to Game Time?",
-	            	"LiveSplit | Cyberpunk 2077",
-	            	MessageBoxButtons.YesNo,MessageBoxIcon.Question
-		);
-	        
-	        if (timingMessage == DialogResult.Yes)
-	        {
-	            timer.CurrentTimingMethod = TimingMethod.GameTime;
-	        }
-	}
-	// Creates a text component at the bottom of the users LiveSplit layout displaying the current objective/quest state
-	vars.SetTextComponent = (Action<string, string>)((id, text) =>
-	{
-	        var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
-	        var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
-	        if (textSetting == null)
-	        {
-		        var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
-		        var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
-		        timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
-		
-		        textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
-		        textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
-	        }
-	
-	        if (textSetting != null)
-	        textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
-	});
-	// Declares the name of the text component
-    	settings.Add("quest_state", true, "Current Objective");
+	    vars.TimerStart = (EventHandler) ((s, e) => timer.IsGameTimePaused = true);
+        timer.OnStart += vars.TimerStart;
+	  	refreshRate=30;
+		if (timer.CurrentTimingMethod == TimingMethod.RealTime)
+// Asks user to change to game time if LiveSplit is currently set to Real Time.
+    {        
+        var timingMessage = MessageBox.Show (
+            "This game uses Time without Loads (Game Time) as the main timing method.\n"+
+            "LiveSplit is currently set to show Real Time (RTA).\n"+
+            "Would you like to set the timing method to Game Time?",
+            "LiveSplit | Cyberpunk 2077",
+            MessageBoxButtons.YesNo,MessageBoxIcon.Question
+        );
+        
+        if (timingMessage == DialogResult.Yes)
+        {
+            timer.CurrentTimingMethod = TimingMethod.GameTime;
+        }
+    }
+// Creates a text component at the bottom of the users LiveSplit layout displaying the current objective/quest state
+		vars.SetTextComponent = (Action<string, string>)((id, text) =>
+    {
+        var textSettings = timer.Layout.Components.Where(x => x.GetType().Name == "TextComponent").Select(x => x.GetType().GetProperty("Settings").GetValue(x, null));
+        var textSetting = textSettings.FirstOrDefault(x => (x.GetType().GetProperty("Text1").GetValue(x, null) as string) == id);
+        if (textSetting == null)
+        {
+        var textComponentAssembly = Assembly.LoadFrom("Components\\LiveSplit.Text.dll");
+        var textComponent = Activator.CreateInstance(textComponentAssembly.GetType("LiveSplit.UI.Components.TextComponent"), timer);
+        timer.Layout.LayoutComponents.Add(new LiveSplit.UI.Components.LayoutComponent("LiveSplit.Text.dll", textComponent as LiveSplit.UI.Components.IComponent));
 
-	// Dictionary containing all of the available objectives/quest states that can be split on	
+        textSetting = textComponent.GetType().GetProperty("Settings", BindingFlags.Instance | BindingFlags.Public).GetValue(textComponent, null);
+        textSetting.GetType().GetProperty("Text1").SetValue(textSetting, id);
+        }
+
+        if (textSetting != null)
+        textSetting.GetType().GetProperty("Text2").SetValue(textSetting, text);
+    });
+// Declares the name of the text component
+    settings.Add("quest_state", true, "Current Objective");
+
+// Dictionary containing all of the available objectives/quest states that can be split on	
 	vars.objectivename = new Dictionary<string,string>
 	{
 		{"08_drive_downtown","Meet Padre // Entered Padre's Car"}, //moves from Meet Padre - Meet Jackie
@@ -197,12 +196,13 @@ startup
 		// Manual split for The Worst Ending
 	};
 	
-	// split on specified objectives
+// split on specified objectives
 	settings.Add("Quest States", true);
-	// Add objectives to setting list
+// Add objectives to setting list
 	foreach (var script in vars.objectivename) {
 		settings.Add(script.Key, true, script.Value, "Quest States");
 	}
+	
 }
 
 init
@@ -212,14 +212,15 @@ init
 	vars.LoadingPtr = IntPtr.Zero;
 	var module = modules.First();
 	var scanner = new SignatureScanner(game, module.BaseAddress, module.ModuleMemorySize);
-	if(version == "2.0")
+	vars.ver = float.Parse(version);
+	if(vars.ver >= 2.0)
 	{
 		vars.LoadingPtr = scanner.Scan(new SigScanTarget(2, "89??????????F0????????????????48FF??33??4889??????????E8????????4584") { 
 		OnFound = (process, scanners, addr) => addr + 0x4 + process.ReadValue<int>(addr)
 		});
 		if (vars.LoadingPtr == IntPtr.Zero)
 		{
-        		throw new Exception("Game engine not initialized - retrying");
+        	throw new Exception("Game engine not initialized - retrying");
 		}
 	}
 
@@ -233,22 +234,29 @@ update
 {
 	vars.loadingWatcher.Update(game);
 	if (settings["quest_state"]) 
-    	{
-     		vars.SetTextComponent("Current Objective", (current.objective)); 
-    	}
-	print(vars.loadingWatcher.Current.ToString());
-	
+    {
+      vars.SetTextComponent("Current Objective", (current.objective)); 
+    }
+	print(current.objective);
 }
 
 start
 {
-	//Starts the timer when the first objective of either the Main Quest or Phantom Liberty is detected
-    	return (current.objective == "generic_sts_objective" || current.objective == "talk_songbird" && current.objective != old.objective);
+	//Start the timer when the first objective of the game is detected
+	if(vars.ver >= 2.0)
+	{
+		return current.objective == "@?Y??[" && current.objective != old.objective; 
+	}
+    return (current.objective == "generic_sts_objective" && current.objective != old.objective);
 }
 
+
 split
-{
-	return current.objective != old.objective && old.objective != null && settings[current.objective];
+{	//currently broken due to objective corruption?
+	if(settings[current.objective])
+	{
+		return current.objective != old.objective && old.objective != null && settings[current.objective];
+	}
 }
 	
 /*checks for the following
@@ -263,9 +271,9 @@ exit
 }
 
 isLoading
-{	if(version == "2.0")
+{	if(vars.ver >= 2.0)
 	{
-		return vars.loadingWatcher.Current == 10 || vars.loadingWatcher.Current == 22;
+		return vars.loadingWatcher.Current == 10;
 	}
 	return current.loading != 70;
 }
