@@ -21,6 +21,10 @@ generic_sts_objective (at the end of load screen when starting new game)
 03_sit_down 1935618864
 05_leave_coyote 1818178864
 */
+state ("Cyberpunk2077","2.01")
+{
+    string50 objective : 0x46B7F90, 0x158, 0x118;
+}
 state ("Cyberpunk2077","2,0")
 {
 	string50 objective : 0x046B6A20, 0xB8, 0x120;
@@ -134,6 +138,7 @@ startup
     });
 // Declares the name of the text component
     settings.Add("quest_state", true, "Current Objective");
+	settings.Add("debug", true, "Debug");
 
 // Dictionary containing all of the available objectives/quest states that can be split on	
 	vars.objectivename = new Dictionary<string,string>
@@ -237,7 +242,10 @@ update
     {
       vars.SetTextComponent("Current Objective", (current.objective)); 
     }
-	print(current.objective);
+	if(settings["debug"])
+	{
+		print(vars.loadingWatcher.Current.ToString());
+	}
 }
 
 start
