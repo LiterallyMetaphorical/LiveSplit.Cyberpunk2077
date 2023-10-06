@@ -238,7 +238,7 @@ init
 	
 
 	
-	vars.loadingWatcher = new MemoryWatcher<byte>(vars.LoadingPtr);
+	vars.loadingWatcher = new MemoryWatcher<int>(vars.LoadingPtr);
 }
 
 update
