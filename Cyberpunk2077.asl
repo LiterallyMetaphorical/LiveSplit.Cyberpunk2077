@@ -217,7 +217,13 @@ init
 	vars.LoadingPtr = IntPtr.Zero;
 	var module = modules.First();
 	var scanner = new SignatureScanner(game, module.BaseAddress, module.ModuleMemorySize);
-	vars.ver = float.Parse(version);
+	float ver;
+	if(!float.TryParse(version,out ver))
+	{
+		ver = 2.0f;
+	}
+	
+	vars.ver = ver;
 	if(vars.ver >= 2.0)
 	{
 		vars.LoadingPtr = scanner.Scan(new SigScanTarget(2, "89??????????F0????????????????48FF??33??4889??????????E8????????4584") { 
@@ -232,7 +238,7 @@ init
 	
 
 	
-	vars.loadingWatcher = new MemoryWatcher<int>(vars.LoadingPtr);
+	vars.loadingWatcher = new MemoryWatcher<byte>(vars.LoadingPtr);
 }
 
 update
