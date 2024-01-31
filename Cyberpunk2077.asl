@@ -21,6 +21,10 @@ generic_sts_objective (at the end of load screen when starting new game)
 03_sit_down 1935618864
 05_leave_coyote 1818178864
 */
+state ("Cyberpunk2077","2.11")
+{
+    string50 objective : 0x0480CB40, 0xB8, 0x120;
+}
 state ("Cyberpunk2077","2.1")
 {
     string50 objective : 0x047CC970, 0xB8, 0x120;
