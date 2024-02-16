@@ -23,8 +23,7 @@ generic_sts_objective (at the end of load screen when starting new game)
 */
 state ("Cyberpunk2077","2.11")
 {
-    //need to update this still
-    //string50 objective : 0x047CC970, 0xB8, 0x120;
+    string50 objective : 0x0480CB40, 0xB8, 0x120;
 }
 state ("Cyberpunk2077","2.1")
 {
@@ -297,7 +296,7 @@ exit
 isLoading
 {	if(vars.ver >= 2.0)
 	{
-		return vars.loadingWatcher.Current == 10 || vars.loadingWatcher.Current == 22 || vars.loadingWatcher.Current == 6;
+		return vars.loadingWatcher.Current == 10 || vars.loadingWatcher.Current == 22 || vars.loadingWatcher.Current == 6 || vars.loadingWatcher.Current == 14;
 	}
 	return current.loading != 70;
 }
