@@ -21,6 +21,10 @@ generic_sts_objective (at the end of load screen when starting new game)
 03_sit_down 1935618864
 05_leave_coyote 1818178864
 */
+state ("Cyberpunk2077","2.12")
+{
+    string50 objective : 0x0480EB00, 0x158, 0x118;
+}
 state ("Cyberpunk2077","2.11")
 {
     string50 objective : 0x0480CB40, 0xB8, 0x120;
@@ -296,7 +300,7 @@ exit
 isLoading
 {	if(vars.ver >= 2.0)
 	{
-		return vars.loadingWatcher.Current == 10 || vars.loadingWatcher.Current == 22 || vars.loadingWatcher.Current == 6 || vars.loadingWatcher.Current == 14;
+		return (vars.loadingWatcher.Current >= 6 && vars.loadingWatcher.Current % 4 == 2);
 	}
 	return current.loading != 70;
 }
