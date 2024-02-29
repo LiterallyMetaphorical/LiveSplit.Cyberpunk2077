@@ -300,7 +300,7 @@ exit
 isLoading
 {	if(vars.ver >= 2.0)
 	{
-		return vars.loadingWatcher.Current == 10 || vars.loadingWatcher.Current == 22 || vars.loadingWatcher.Current == 6 || vars.loadingWatcher.Current == 14;
+		return (vars.loadingWatcher.Current >= 6 && vars.loadingWatcher.Current % 4 == 2);
 	}
 	return current.loading != 70;
 }
